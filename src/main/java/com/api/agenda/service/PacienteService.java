@@ -1,5 +1,6 @@
 package com.api.agenda.service;
 
+import com.api.agenda.exception.BusinessException;
 import com.api.agenda.model.Paciente;
 import com.api.agenda.repository.PacienteRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,19 @@ public class PacienteService {
 
 
     public Paciente salvar(Paciente paciente) {
+        Optional<Paciente> optionalPaciente = repository.findByCpf(paciente.getCpf());
+        boolean existeCpf = false;
+        if (optionalPaciente.isPresent()) {
+            if (!optionalPaciente.get().getId().equals(paciente.getId())) {
+                existeCpf = true;
+            }
+
+        }
+
+        if (existeCpf) {
+            throw new BusinessException("Cpf já cadastrado!");
+        }
+
         return repository.save(paciente);
     }
 

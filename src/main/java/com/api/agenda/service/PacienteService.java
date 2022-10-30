@@ -47,5 +47,19 @@ public class PacienteService {
         repository.deleteById(id);
     }
 
+    public Paciente update(Long id, Paciente paciente) {
+        Optional<Paciente> optional = buscarPorId(id);
+
+        if (optional.isEmpty()) {
+            throw new BusinessException("Paciente não encontrado");
+        }
+
+        paciente.setId(id);
+
+        return repository.save(paciente);
+
+
+    }
+
 
 }

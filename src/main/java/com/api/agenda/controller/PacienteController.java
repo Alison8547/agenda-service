@@ -8,13 +8,16 @@ import com.api.agenda.service.PacienteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
+@Validated
 @RequestMapping("/paciente")
 public class PacienteController {
 
@@ -29,7 +32,7 @@ public class PacienteController {
     }
 
     @PostMapping
-    public ResponseEntity<PacienteResponse> salvar(@RequestBody PacienteRequest paciente) {
+    public ResponseEntity<PacienteResponse> salvar(@Valid @RequestBody PacienteRequest paciente) {
 
         Paciente toPaciente = mapper.toPaciente(paciente);
         Paciente pacienteSalvo = service.salvar(toPaciente);
@@ -43,11 +46,11 @@ public class PacienteController {
         return ResponseEntity.status(HttpStatus.OK).body(mapper.toPacienteResponse(paciente.get()));
     }
 
-    @PutMapping
-    public ResponseEntity<PacienteResponse> alterarPaciente(@RequestBody PacienteRequest paciente) {
+    @PutMapping("/{idPaciente}")
+    public ResponseEntity<PacienteResponse> alterarPaciente(@PathVariable(name = "idPaciente") Long id, @Valid @RequestBody PacienteRequest paciente) {
 
         Paciente toPaciente = mapper.toPaciente(paciente);
-        Paciente pacienteSalvo = service.salvar(toPaciente);
+        Paciente pacienteSalvo = service.update(id, toPaciente);
         return ResponseEntity.status(HttpStatus.OK).body(mapper.toPacienteResponse(pacienteSalvo));
     }
 

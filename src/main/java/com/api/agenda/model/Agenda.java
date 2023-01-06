@@ -1,5 +1,6 @@
 package com.api.agenda.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,6 +16,9 @@ public class Agenda {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "paciente_id", insertable = false, updatable = false)
+    private Long idPaciente;
+
     @Column(name = "descricao")
     private String descricao;
 
@@ -24,6 +28,7 @@ public class Agenda {
     @Column(name = "data_criacao")
     private LocalDateTime dataCriacao;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     private Paciente paciente;
 }

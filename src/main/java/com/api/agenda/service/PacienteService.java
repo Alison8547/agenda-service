@@ -1,64 +1,59 @@
 package com.api.agenda.service;
 
 import com.api.agenda.exception.BusinessException;
+import com.api.agenda.mapper.PacienteMapper;
 import com.api.agenda.model.Paciente;
 import com.api.agenda.repository.PacienteRepository;
+import com.api.agenda.request.PacienteRequest;
+import com.api.agenda.response.PacienteResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class PacienteService {
 
-    private final PacienteRepository repository;
+    private final PacienteRepository pacienteRepository;
+    private final PacienteMapper pacienteMapper;
 
 
-    public Paciente salvar(Paciente paciente) {
-        Optional<Paciente> optionalPaciente = repository.findByCpf(paciente.getCpf());
-        boolean existeCpf = false;
-        if (optionalPaciente.isPresent()) {
-            if (!optionalPaciente.get().getId().equals(paciente.getId())) {
-                existeCpf = true;
-            }
-
+    public PacienteResponse salvar(PacienteRequest pacienteRequest) {
+        Paciente pacienteEntity = pacienteMapper.toPaciente(pacienteRequest);
+        if (pacienteRepository.existsByCpf(pacienteEntity.getCpf()) || pacienteRepository.existsByEmail(pacienteEntity.getEmail())) {
+            throw new BusinessException("Cpf ou Email já consta no nosso sistema!");
         }
 
-        if (existeCpf) {
-            throw new BusinessException("Cpf já cadastrado!");
-        }
-
-        return repository.save(paciente);
+        return pacienteMapper.toPacienteResponse(pacienteRepository.save(pacienteEntity));
     }
 
-    public List<Paciente> list() {
-        return repository.findAll();
+    public List<PacienteResponse> list() {
+        return pacienteMapper.pacienteResponseList(pacienteRepository.findAll());
     }
 
-    public Optional<Paciente> buscarPorId(Long id) {
-        return repository.findById(id);
+    public Paciente buscarPorId(Long idPaciente) {
+        return pacienteRepository.findById(idPaciente).orElseThrow(() -> new BusinessException("Paciente não encontrado"));
     }
 
-    public void deletar(Long id) {
-        repository.deleteById(id);
+    public PacienteResponse pegarPaciente(Long idPaciente) {
+        return pacienteMapper.toPacienteResponse(buscarPorId(idPaciente));
     }
 
-    public Paciente update(Long id, Paciente paciente) {
-        Optional<Paciente> optional = buscarPorId(id);
+    public void deletar(Long idPaciente) {
+        pacienteRepository.deleteById(idPaciente);
+    }
 
-        if (optional.isEmpty()) {
-            throw new BusinessException("Paciente não encontrado");
-        }
+    public PacienteResponse update(Long idPaciente, PacienteRequest pacienteRequest) {
+        Paciente pacienteEncontrado = buscarPorId(idPaciente);
+        pacienteEncontrado.setNome(pacienteRequest.getNome());
+        pacienteEncontrado.setCpf(pacienteRequest.getCpf());
+        pacienteEncontrado.setEmail(pacienteRequest.getEmail());
+        pacienteEncontrado.setSobrenome(pacienteRequest.getSobrenome());
 
-        paciente.setId(id);
-
-        return repository.save(paciente);
-
-
+        return pacienteMapper.toPacienteResponse(pacienteRepository.save(pacienteEncontrado));
     }
 
 

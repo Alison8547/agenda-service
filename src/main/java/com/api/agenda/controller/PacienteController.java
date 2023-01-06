@@ -1,6 +1,5 @@
 package com.api.agenda.controller;
 
-import com.api.agenda.mapper.PacienteMapper;
 import com.api.agenda.model.Paciente;
 import com.api.agenda.request.PacienteRequest;
 import com.api.agenda.response.PacienteResponse;
@@ -24,8 +23,7 @@ import java.util.Optional;
 @RequestMapping("/paciente")
 public class PacienteController {
 
-    private final PacienteService service;
-    private final PacienteMapper mapper;
+    private final PacienteService pacienteService;
 
     @Operation(summary = "Listar todos os pacientes", description = "Listar pacientes do banco de dados")
     @ApiResponses(
@@ -37,9 +35,7 @@ public class PacienteController {
     )
     @GetMapping
     public ResponseEntity<List<PacienteResponse>> list() {
-
-        List<PacienteResponse> pacienteResponses = mapper.pacienteResponseList(service.list());
-        return ResponseEntity.status(HttpStatus.OK).body(pacienteResponses);
+        return ResponseEntity.status(HttpStatus.OK).body(pacienteService.list());
     }
 
     @Operation(summary = "Salvar um paciente", description = "Salvar um paciente no banco de dados")
@@ -53,9 +49,7 @@ public class PacienteController {
     @PostMapping
     public ResponseEntity<PacienteResponse> salvar(@Valid @RequestBody PacienteRequest paciente) {
 
-        Paciente toPaciente = mapper.toPaciente(paciente);
-        Paciente pacienteSalvo = service.salvar(toPaciente);
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toPacienteResponse(pacienteSalvo));
+        return ResponseEntity.status(HttpStatus.CREATED).body(pacienteService.salvar(paciente));
     }
 
     @Operation(summary = "Pegar um paciente por id", description = "Pegar um paciente no banco de dados")
@@ -67,10 +61,9 @@ public class PacienteController {
             }
     )
     @GetMapping("/{idPaciente}")
-    public ResponseEntity<PacienteResponse> buscarByIdPaciente(@PathVariable(name = "idPaciente") Long id) {
+    public ResponseEntity<PacienteResponse> buscarByIdPaciente(@PathVariable(name = "idPaciente") Long idPaciente) {
 
-        Optional<Paciente> paciente = service.buscarPorId(id);
-        return ResponseEntity.status(HttpStatus.OK).body(mapper.toPacienteResponse(paciente.get()));
+        return ResponseEntity.status(HttpStatus.OK).body(pacienteService.pegarPaciente(idPaciente));
     }
 
     @Operation(summary = "Atualizar um paciente", description = "Atualizar um paciente no banco de dados")
@@ -82,11 +75,9 @@ public class PacienteController {
             }
     )
     @PutMapping("/{idPaciente}")
-    public ResponseEntity<PacienteResponse> alterarPaciente(@PathVariable(name = "idPaciente") Long id, @Valid @RequestBody PacienteRequest paciente) {
+    public ResponseEntity<PacienteResponse> alterarPaciente(@PathVariable(name = "idPaciente") Long idPaciente, @Valid @RequestBody PacienteRequest pacienteRequest) {
 
-        Paciente toPaciente = mapper.toPaciente(paciente);
-        Paciente pacienteSalvo = service.update(id, toPaciente);
-        return ResponseEntity.status(HttpStatus.OK).body(mapper.toPacienteResponse(pacienteSalvo));
+        return ResponseEntity.status(HttpStatus.OK).body(pacienteService.update(idPaciente, pacienteRequest));
     }
 
     @Operation(summary = "Apagar um paciente", description = "Apagar um paciente um paciente no banco de dados")
@@ -99,7 +90,7 @@ public class PacienteController {
     )
     @DeleteMapping("/{idPaciente}")
     public ResponseEntity<Void> deletePaciente(@PathVariable(name = "idPaciente") Long id) {
-        service.deletar(id);
+        pacienteService.deletar(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

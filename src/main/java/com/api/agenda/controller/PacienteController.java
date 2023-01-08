@@ -3,6 +3,7 @@ package com.api.agenda.controller;
 import com.api.agenda.model.Paciente;
 import com.api.agenda.request.PacienteRequest;
 import com.api.agenda.response.PacienteResponse;
+import com.api.agenda.response.PageResponse;
 import com.api.agenda.service.PacienteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,6 +37,19 @@ public class PacienteController {
     @GetMapping
     public ResponseEntity<List<PacienteResponse>> list() {
         return ResponseEntity.status(HttpStatus.OK).body(pacienteService.list());
+    }
+
+    @Operation(summary = "Listar todos os pacientes paginado", description = "Listar pacientes do banco de dados")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Listou com sucesso"),
+                    @ApiResponse(responseCode = "403", description = "Você não tem permissão para acessar este recurso"),
+                    @ApiResponse(responseCode = "500", description = "Foi gerada uma exceção")
+            }
+    )
+    @GetMapping("/list-paginado")
+    public ResponseEntity<PageResponse<PacienteResponse>> listPaginadoPaciente(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer size, @RequestParam(required = false) String nome, @RequestParam(required = false) String email) {
+        return ResponseEntity.status(HttpStatus.OK).body(pacienteService.listPacientePagina(page, size, nome, email));
     }
 
     @Operation(summary = "Salvar um paciente", description = "Salvar um paciente no banco de dados")

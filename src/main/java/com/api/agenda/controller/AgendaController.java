@@ -2,6 +2,7 @@ package com.api.agenda.controller;
 
 import com.api.agenda.request.AgendaRequest;
 import com.api.agenda.response.AgendaResponse;
+import com.api.agenda.response.PageResponse;
 import com.api.agenda.service.AgendaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Validated
@@ -46,6 +48,19 @@ public class AgendaController {
     @GetMapping("/list-all")
     public ResponseEntity<List<AgendaResponse>> listAgenda() {
         return new ResponseEntity<>(agendaService.listAll(), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Listar todas as agendas paginado", description = "Listar agendas do banco de dados")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Listou com sucesso"),
+                    @ApiResponse(responseCode = "403", description = "Você não tem permissão para acessar este recurso"),
+                    @ApiResponse(responseCode = "500", description = "Foi gerada uma exceção")
+            }
+    )
+    @GetMapping("/list-all-paginado")
+    public ResponseEntity<PageResponse<AgendaResponse>> listAgenda(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer size, @RequestParam(required = false) Long idPaciente) {
+        return new ResponseEntity<>(agendaService.listAgendaPaginado(page, size, idPaciente), HttpStatus.OK);
     }
 
     @Operation(summary = "Salvar uma agenda", description = "Salvar uma agenda no banco de dados")

@@ -5,12 +5,11 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class AgendaResponse {
+public class AgendaResponsePersonalizado {
 
     private Long id;
     private String descricao;
     private LocalDateTime dataCriacao;
     private LocalDateTime horario;
-    private PacienteResponsePersonalizado paciente;
 
 }

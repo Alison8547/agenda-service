@@ -91,5 +91,9 @@ public class PacienteService {
         return pacienteMapper.toPacienteResponse(pacienteRepository.save(pacienteEncontrado));
     }
 
+    public boolean pacientExists(Long pacienteId) {
+        return pacienteRepository.existsById(pacienteId);
+    }
+
 
 }

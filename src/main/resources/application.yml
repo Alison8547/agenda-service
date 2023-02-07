@@ -1,0 +1,13 @@
+# DATASOURCE
+springdoc:
+  swagger-ui:
+    path: /
+
+spring:
+  datasource:
+    url: xxx
+    username: xxx
+    password: xxx
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect

@@ -33,4 +33,8 @@ public class Paciente {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "paciente")
     private Set<Agenda> agendas;
 
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "paciente")
+    private Set<Endereco> enderecos;
+
 }
